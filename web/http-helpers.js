@@ -32,7 +32,7 @@ var collectData = function(request, callback) {
     url = url.slice(4);
   });
   request.on('end', function() {
-    archive.addUrlToList(url, function(url) {
+    archive.addUrlToList(url, function() {
       callback(url);
     });
   });

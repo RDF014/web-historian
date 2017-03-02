@@ -45,7 +45,16 @@ exports.methods = {
     });
   },
   'GET': function(request, response) {
-
+    if (request.url === '/') {
+      sendResponse(response, '/<input/');  // REVIST, ARE WE RETURNING THE RIGHT URL?!
+    }
+    archive.isUrlArchived(request.url, function(bool) {
+      if (!bool) {
+        sendResponse(response, 'Not found', 404);
+      } else {
+        sendResponse(response, request.url);
+      }
+    });
   },
   'OPTIONS': function(request, response) {
 

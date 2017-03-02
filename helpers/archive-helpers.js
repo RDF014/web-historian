@@ -49,7 +49,7 @@ exports.isUrlInList = function(url, callback) {
 };
 
 exports.addUrlToList = function(url, callback) {
-  fs.writeFile(this.paths.list, url, () => { callback(); });
+  fs.writeFile(this.paths.list, url + '\n', () => { callback(url); });
 };
 
 exports.isUrlArchived = function(url, callback) {
@@ -63,4 +63,7 @@ exports.isUrlArchived = function(url, callback) {
 };
 
 exports.downloadUrls = function(urls) {
+  urls.forEach(function(url) {
+    fs.writeFile(`${this.paths.archivedSites}/${url}`, '');
+  }.bind(this));
 };

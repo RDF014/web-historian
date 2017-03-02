@@ -1,6 +1,6 @@
 var path = require('path');
 var fs = require('fs');
-var archive = require('../helpers/archive-helpers');
+var archive = require('../helpers/archive-helpers.js');
 
 exports.headers = {
   'access-control-allow-origin': '*',
@@ -19,3 +19,37 @@ exports.serveAssets = function(res, asset, callback) {
 
 
 // As you progress, keep thinking about what helper functions you can put here!
+var sendResponse = function(response, data, statusCode) {
+  statusCode = statusCode || 200;
+  response.writeHead(statusCode, exports.headers);
+  response.end(data);
+};
+
+var collectData = function(request, callback) {
+  var url = '';
+  request.on('data', function(data) {
+    url += data;
+    url = url.slice(4);
+  });
+  request.on('end', function() {
+    archive.addUrlToList(url, function(url) {
+      callback(url);
+    });
+  });
+};
+
+exports.methods = {
+  'POST': function(request, response) {
+    collectData(request, function(url) {
+      sendResponse(response, url, 302);
+    });
+  },
+  'GET': function(request, response) {
+
+  },
+  'OPTIONS': function(request, response) {
+
+  }
+};
+
+

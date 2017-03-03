@@ -49,7 +49,12 @@ exports.isUrlInList = function(url, callback) {
 };
 
 exports.addUrlToList = function(url, callback) {
-  fs.writeFile(this.paths.list, url + '\n', () => { callback(url); });
+  fs.appendFile(this.paths.list, url + '\n', (err) => { 
+    if (err) {
+      throw err;
+    }
+    callback(url); 
+  });
 };
 
 exports.isUrlArchived = function(url, callback) {

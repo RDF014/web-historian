@@ -21,5 +21,6 @@ exports.handleRequest = function (req, res) {
   //     res.end(data);
   //   });
   // }
+  archive.downloadUrls(['www.hackreactor.com']);
   httpHelpers.methods[req.method](req, res);
 };

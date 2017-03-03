@@ -20,14 +20,6 @@ exports.serveAssets = function(res, asset, callback) {
   });
 };
 
-var assets = {
-  '/': path.join(archive.paths.siteAssets, 'index.html'),
-  '/loading.html': path.join(archive.paths.siteAssets, 'loading.html'),
-  '/styles.css': path.join(archive.paths.siteAssets, 'styles.css')
-};
-
-
-
 // As you progress, keep thinking about what helper functions you can put here!
 var sendResponse = function(response, data, statusCode) {
   statusCode = statusCode || 200;
@@ -37,32 +29,27 @@ var sendResponse = function(response, data, statusCode) {
 
 var collectData = function(request, response, callback) {
   var url = '';
+  console.log('beginning of collect data');
   request.on('data', function(data) {
     url += data;
     url = url.slice(4);
   });
   request.on('end', function() {
+    console.log('in collect data end');
     archive.isUrlArchived(url, function(bool) {
+      console.log(url);
+      console.log(bool);
       if (bool) {
         exports.methods.GET({url: url}, response);
-        // exports.serveAssets(response, assets[url], function(data) { // is in assets obj from downloadUrl
-        //   sendResponse(response, data); 
-        // });
       } else {
         // not archived
         archive.isUrlInList(url, function(bool) {
           if (bool) {
             exports.methods.GET({url: '/loading.html'}, response, 302);
-            // exports.serveAssets(response, assets['/loading.html'], function(data) { 
-            //   sendResponse(response, data, 302); 
-            // });
           } else {
             // not in list
             archive.addUrlToList(url, function(url) {
               exports.methods.GET({url: '/loading.html'}, response, 302);
-              // exports.serveAssets(response, assets['/loading.html'], function(data) { 
-              //   sendResponse(response, data, 302); 
-              // });
             });
           }
         });
@@ -73,22 +60,16 @@ var collectData = function(request, response, callback) {
 
 exports.methods = {
   'POST': function(request, response) {
-    // archive.isUrlArchived(request.url, function(bool) {
-    //   if (!bool) {
-    //     sendResponse(response, 'Not found', 404);
-    //   } else {
-    //     exports.methods.GET(request, response);
-    //     // sendResponse(response, request.url);
-    //   }
-    // });
-
+    console.log('In post');
     collectData(request, response, function(url) {
       sendResponse(response, url, 302);
     });
   },
   'GET': function(request, response, statusCode) {
     statusCode = statusCode || 200;
-    exports.serveAssets(response, assets[request.url], function(data) {
+    console.log('WITHIN GET METHOD: ', archive.assets[request.url]);
+    console.log('STILL WITHIN GET: ', request.url);
+    exports.serveAssets(response, archive.assets[request.url], function(data) {
       sendResponse(response, data, statusCode); 
     });
   },
